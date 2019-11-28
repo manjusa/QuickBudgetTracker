@@ -4,11 +4,47 @@
         <script type="text/javascript" src="jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="jquery.tmpl.js"></script>
         <script>
             var _total=18000;      
             var _arrData=[];
             var _data='';
-            $(document).ready(function() {  
+            var _drillDownArrJson=[{
+                "label":"decor",
+                "items":[{
+                    "name":"item0",
+                    "cost":"200"
+                },{
+                    "name":"item1",
+                    "cost":"400"
+                }]
+            }];
+            $(document).ready(function() { 
+
+                function getItemsArrayForCategory(clickedCat){
+                    for (var key in _drillDownArrJson){   
+                        var currCat =_drillDownArrJson[key]["label"];
+                        if(currCat==clickedCat){
+                            return _drillDownArrJson[key];
+                        }
+                    }
+                    return null;
+                }
+                function drillDown(e){
+                    var clickedSection=e.dataPoint["label"];
+                    var itemsArr= getItemsArrayForCategory(clickedSection);
+                    // e.chart.options.title = { text: e.dataPoint.name }
+                    //e.chart.render();
+                    //$("#backButton").toggleClass("invisible");
+                    $("#itemlist").modal("show");
+                    //LIST_OF_ITEMS_BOUGHT  itemsBoughtCardId
+                    $('#itemsBoughtCardId').empty();  
+                    // $('#table').append($("#DRAGGABLE_ELEMENTS_TEMPLATE").tmpl(_obj));
+                    $("#itemsBoughtCardId").append($("#LIST_OF_ITEMS_BOUGHT_TEMPLATE").tmpl(itemsArr));
+                }
+                $("#itemlist").on("shown.bs.modal",function(){
+
+                }); 
                 function isCategoryAlreadyExisting(cat){
                     var catFoungFlag=false;
                     for (var key in _arrData){   
@@ -89,12 +125,14 @@
                 });
                 function displayChart(){
                     var options = {
+
                         animationEnabled: true,
                         title: {
                             text: "Manjus quick expense tracker"
                         },
                         data: [{
                             type: "doughnut",
+                            click:drillDown,
                             innerRadius: "70%",
                             showInLegend: true,
                             legendText: "{label}",
@@ -158,6 +196,40 @@
 
             </div>
         </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="itemlist" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="itemlist" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div  id="itemsBoughtCardId" class="modal-content">
+
+                </div>
+
+            </div>
+        </div>
         <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+
+        <script id="LIST_OF_ITEMS_BOUGHT_TEMPLATE" type="text/x-jquery-tmpl">
+            <div class="modal-header">
+                <h5 class="modal-title" id="datewithstringmodalLabel">Items bought for ${label} are</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                    <ul>
+                       
+                             {{each items}}
+                               <li>  Item name is ${name} and Cost of the item is ${cost} </li>  
+                             {{/each}}
+                        
+                    </ul>
+
+            </div>
+            <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+
+        </script>
     </body>
 </html>

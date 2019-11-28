@@ -1,3 +1,11 @@
 We will learn various options to create dates
 11 means dec
 default format of Date
+
+_arrData eg
+_arrData=[
+
+{label:"furniture",y:55,55},
+{label:"decor",y:27.77}
+
+]
