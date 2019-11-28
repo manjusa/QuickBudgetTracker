@@ -1,18 +1,25 @@
 <!DOCTYPE HTML>
 <html>
     <head>
-        <script type="text/javascript" src="jquery.min.js"></script>              
-
+        <script type="text/javascript" src="jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <script>
             var _total=18000;      
             var _arrData=[];
             var _data='';
-
             $(document).ready(function() {  
                 function isCategoryAlreadyExisting(cat){
-                    return true;
+                    var catFoungFlag=false;
+                    for (var key in _arrData){   
+                        var currCat =_arrData[key]["label"];
+                        if(currCat==cat){
+                            catFoungFlag=true;
+                            break;
+                        }
+                    }
+                    alert(catFoungFlag);
+                    return catFoungFlag;
                 }
                 function iterateOverArrayOfJsonAndSplice(x,category){
                     for (var j=0;j<x.length;j++){
@@ -42,7 +49,6 @@
                         _arrData.push(l);
                     }
                     var remaining=_total-totalCostOfAllCat;
-                    alert(remaining);
                     iterateOverArrayOfJsonAndSplice(_arrData,"remaining");
                     updateArray(_arrData,remaining,"remaining");                    
                 }
@@ -76,29 +82,10 @@
 
                     }
                     else{
-                updateArray(_arrData,cost,category);    
-                      /*  var l = {
-                            // [key]: data[key]  
-                            label:category,
-                            y:(cost*100/_total)  
-                        }
-                        _arrData.push(l);*/
+                        updateArray(_arrData,cost,category);                         
                     }
                     displayChart();
-                    /*  $.ajax({
-                        url: 'https://api.jsonbin.io/b/5ddb6199264e8f39a7bb91d6',
-                        type: 'put',//5ddb6199264e8f39a7bb91d6
-                        data:'{"furniture": "10000","decor":"5000"}',
-                        headers: {
-                            "Content-type": 'application/json', 
-                            "secret-key": '$2b$10$wViALK6fcTtVOJfffcaiHeVPEHlNt8KIzJhhFHdrxxmv.iE6v33x.'  
-                        },
-                        dataType: 'json',
-                        success: function (data) {
-                            //alert(data);
-                            console.log(data);
-                        }
-                    });*/
+
                 });
                 function displayChart(){
                     var options = {
@@ -108,17 +95,10 @@
                         },
                         data: [{
                             type: "doughnut",
-                            innerRadius: "40%",
+                            innerRadius: "70%",
                             showInLegend: true,
                             legendText: "{label}",
-                            indexLabel: "{label}: #percent%",
-                            /*dataPoints: [
-                                { label: "Total", y: 1000 },
-                                { label: "Discount Stores", y: 20 },
-                                { label: "Stores for Men / Women", y: 10 },
-                                { label: "Teenage Specialty Stores", y: 6 },
-                                { label: "All other outlets", y: 4 }
-                            ]*/
+                            indexLabel: "{label}: #percent%",                           
                             dataPoints: _arrData
                         }] 
                     };
@@ -134,9 +114,8 @@
     </head>
     <body>
         <div id="chartContainer" style="height: 300px; width: 100%;"></div>
-        <h3 style="margin-left:30%">Plan your budget</h3>
         <div style="margin-left: 5%;">
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#itembought" >Add Item</button>
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#itembought" >Add New Item</button>
             <!--<button id="displayBudget" type="button" class="btn btn-info">Get current budget</button>-->
         </div>
 
