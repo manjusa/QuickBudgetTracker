@@ -1,0 +1,184 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <script type="text/javascript" src="jquery.min.js"></script>              
+
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script>
+            var _total=18000;      
+            var _arrData=[];
+            var _data='';
+
+            $(document).ready(function() {  
+                function isCategoryAlreadyExisting(cat){
+                    return true;
+                }
+                function iterateOverArrayOfJsonAndSplice(x,category){
+                    for (var j=0;j<x.length;j++){
+                        if(x[j]["label"]==category){
+                            x.splice(j,1);
+                            break;
+                        }                           
+                    }   
+                }
+                function updateArray(x,currItemCost,category){
+                    var l = {
+                        label:category,
+                        y:(currItemCost*100/_total)  
+                    }
+                    x.push(l);
+                }
+                function convertDataToArrayOfJsonObjects(data){
+                    var totalCostOfAllCat=0;
+                    for (var key in data){   
+                        var cat =key;
+                        var cost=Number(data[key]);
+                        totalCostOfAllCat+=cost;
+                        var l = {
+                            label:key,
+                            y:(data[key]*100/_total)
+                        }
+                        _arrData.push(l);
+                    }
+                    var remaining=_total-totalCostOfAllCat;
+                    alert(remaining);
+                    iterateOverArrayOfJsonAndSplice(_arrData,"remaining");
+                    updateArray(_arrData,remaining,"remaining");                    
+                }
+
+                $.ajax({
+                    url: 'https://api.jsonbin.io/b/5ddb6199264e8f39a7bb91d6/latest',
+                    type: 'GET',//5ddb6199264e8f39a7bb91d6                        
+                    headers: {
+                        "secret-key": '$2b$10$wViALK6fcTtVOJfffcaiHeVPEHlNt8KIzJhhFHdrxxmv.iE6v33x.'  
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        _data=data;
+                        convertDataToArrayOfJsonObjects(data);
+                        displayChart();
+                    }
+                });
+                function calculateCostForCategory(category,currCost){
+                    var existingCost=_data[category];
+                    existingCost=Number(existingCost)+Number(currCost);
+                    return existingCost;
+                }
+                $("#submitOfItem").on("click",function(){
+                    //alert("submitted");
+                    var currCost=$("#costofitem").val();
+                    var category=$("#category").val();
+                    if(isCategoryAlreadyExisting(category)){
+                        var cost=calculateCostForCategory(category,currCost);
+                        iterateOverArrayOfJsonAndSplice(_arrData,category);                       
+                        updateArray(_arrData,cost,category);                    
+
+                    }
+                    else{
+                updateArray(_arrData,cost,category);    
+                      /*  var l = {
+                            // [key]: data[key]  
+                            label:category,
+                            y:(cost*100/_total)  
+                        }
+                        _arrData.push(l);*/
+                    }
+                    displayChart();
+                    /*  $.ajax({
+                        url: 'https://api.jsonbin.io/b/5ddb6199264e8f39a7bb91d6',
+                        type: 'put',//5ddb6199264e8f39a7bb91d6
+                        data:'{"furniture": "10000","decor":"5000"}',
+                        headers: {
+                            "Content-type": 'application/json', 
+                            "secret-key": '$2b$10$wViALK6fcTtVOJfffcaiHeVPEHlNt8KIzJhhFHdrxxmv.iE6v33x.'  
+                        },
+                        dataType: 'json',
+                        success: function (data) {
+                            //alert(data);
+                            console.log(data);
+                        }
+                    });*/
+                });
+                function displayChart(){
+                    var options = {
+                        animationEnabled: true,
+                        title: {
+                            text: "Manjus quick expense tracker"
+                        },
+                        data: [{
+                            type: "doughnut",
+                            innerRadius: "40%",
+                            showInLegend: true,
+                            legendText: "{label}",
+                            indexLabel: "{label}: #percent%",
+                            /*dataPoints: [
+                                { label: "Total", y: 1000 },
+                                { label: "Discount Stores", y: 20 },
+                                { label: "Stores for Men / Women", y: 10 },
+                                { label: "Teenage Specialty Stores", y: 6 },
+                                { label: "All other outlets", y: 4 }
+                            ]*/
+                            dataPoints: _arrData
+                        }] 
+                    };
+                    $("#chartContainer").CanvasJSChart(options);
+                }
+                $("#displayBudget").on("click",function(){
+                    displayChart();
+
+                });
+            });                
+
+        </script>
+    </head>
+    <body>
+        <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+        <h3 style="margin-left:30%">Plan your budget</h3>
+        <div style="margin-left: 5%;">
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#itembought" >Add Item</button>
+            <!--<button id="displayBudget" type="button" class="btn btn-info">Get current budget</button>-->
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="itembought" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="itembought" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="datewithstringmodalLabel">Name of you bin</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="costofitem" class="col-form-label">Category</label>
+                                <select id="category" class="mdb-select md-form">
+                                    <option value="" disabled selected>SELECT</option>
+                                    <option value="furniture">Furniture</option>
+                                    <option value="decor">Decor</option>
+                                    <option value="appliances">Appliances</option>
+                                    <option value="utensils">Utensils</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </form>                          
+                        <form>
+                            <div class="form-group">
+                                <label for="costofitem" class="col-form-label">Cost</label>
+                                <input type="text" id="costofitem" style="margin-left: 28px">
+                            </div>
+                        </form> 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button id="submitOfItem" type="button"  data-dismiss="modal" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+    </body>
+</html>
