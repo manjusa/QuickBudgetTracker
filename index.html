@@ -1,15 +1,19 @@
 <!DOCTYPE HTML>
 <html>
     <head>
+
         <script type="text/javascript" src="jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <script src="jquery.tmpl.js"></script>
+        <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+        <!--  <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">--->
+
         <script>
             var _total=18000;      
             var _arrData=[];
-            var _data='';
-            /*var _drillDownArrJson=[{
+            // var _data='';removed           
+            /* var _drillDownArrJson=[{
                 "label":"decor",
                 "items":[{
                     "name":"item0",
@@ -18,19 +22,9 @@
                     "name":"item1",
                     "cost":"400"
                 }]
-            }];*/
-            var _drillDownArrJson=[{
-                "label":"decor",
-                "items":[{
-                    "name":"item0",
-                    "cost":"200"
-                },{
-                    "name":"item1",
-                    "cost":"400"
-                }]
-            }];   
+            }];   */
+            var _drillDownArrJson=[];
             $(document).ready(function() { 
-
                 function getItemsArrayForCategory(clickedCat){
                     for (var key in _drillDownArrJson){   
                         var currCat =_drillDownArrJson[key]["label"];
@@ -51,10 +45,7 @@
                     $('#itemsBoughtCardId').empty();  
                     // $('#table').append($("#DRAGGABLE_ELEMENTS_TEMPLATE").tmpl(_obj));
                     $("#itemsBoughtCardId").append($("#LIST_OF_ITEMS_BOUGHT_TEMPLATE").tmpl(itemsArr));
-                }
-                $("#itemlist").on("shown.bs.modal",function(){
-
-                }); 
+                }               
                 function isCategoryAlreadyExisting(cat){
                     var catFoungFlag=false;
                     for (var key in _arrData){   
@@ -64,7 +55,7 @@
                             break;
                         }
                     }
-                    alert(catFoungFlag);
+                    //  alert(catFoungFlag);
                     return catFoungFlag;
                 }
                 function iterateOverArrayOfJsonAndSplice(x,category){
@@ -81,6 +72,9 @@
                         y:(currItemCost*100/_total)  
                     }
                     x.push(l);
+                }
+                function updateArrayForDrillDown(existingArr,objtoBeAdded,cat){                 
+                    existingArr.push(objtoBeAdded);                   
                 }
                 function convertDataToArrayOfJsonObjects(data){
                     var totalCostOfAllCat=0;
@@ -107,13 +101,15 @@
                     },
                     dataType: 'json',
                     success: function (data) {
-                        _data=data;
+                        // _data=data;removed
+                        // _arrData=data;
                         convertDataToArrayOfJsonObjects(data);
                         displayChart();
                     }
                 });
                 function calculateCostForCategory(category,currCost){
-                    var existingCost=_data[category];
+                    // var existingCost=_data[category];removed
+                    var existingCost=_arrData[category];                    
                     existingCost=Number(existingCost)+Number(currCost);
                     return existingCost;
                 }
@@ -129,23 +125,28 @@
                         return;
                     }
                     if(isCategoryAlreadyExisting(category)){
-                        var cost=calculateCostForCategory(category,currCost);
+                        var calculateCostSoFarForCat=calculateCostForCategory(category,currCost);
                         iterateOverArrayOfJsonAndSplice(_arrData,category);                       
-                        updateArray(_arrData,cost,category);                    
-
+                        updateArray(_arrData,calculateCostSoFarForCat,category); 
                     }
                     else{
-                        updateArray(_arrData,cost,category);                         
+                        updateArray(_arrData,currCost,category);                         
                     }
-                    $("#itembought").modal( "hide" );
+                    var itemAdded={
+                        "name":currItem,
+                        "cost":currCost
+                    }
+                    updateArrayForDrillDown(_drillDownArrJson,itemAdded,category); 
+                    $("#itembought").modal("hide");
                     displayChart();
-
                 });
+
+
                 function displayChart(){
                     var options = {
                         animationEnabled: true,
                         title: {
-                            text: "Manjus quick expense tracker"
+                            text: "Quick Demo of Pie chart"
                         },
                         data: [{
                             type: "doughnut",
@@ -179,6 +180,9 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="datewithstringmodalLabel">Name of you bin</h5>
+                        <button style="background-color:white"   type="button" class="btn btn-default" aria-label="right Align">
+                            <i class="fas icon-info-sign" title="Do you like my fa-coq icon?"></i>
+                        </button>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
