@@ -13,30 +13,21 @@
 
         <script>
             var _total=18000;      
-            var _arrData=[];
-            // var _data='';removed     https://stackoverflow.com/questions/55791417/bootstrap-4-input-field-in-popover      
-            /* var _drillDownArrJson=[{
-                "label":"decor",
-                "items":[{
-                    "name":"item0",
-                    "cost":"200"
-                },{
-                    "name":"item1",
-                    "cost":"400"
-                }]
-            }];   */
+            var _arrData=[];           
             var _drillDownArrJson=[];
             $(document).ready(function() { 
-                 $('body').on('click','button#updatebudget',function(){
-                     _total =$('.popover-body').find('#newbudget').val()
+                $('body').on('click','button#updatebudget',function(){
+                    var x= $('.popover-body').find('#newbudget').val();
+                    if(x.length >0 && x>1000)//budget should be atleast 1000
+                        _total=x;
 
-                     alert(_total);
-                 });
+                });
+                $('body').on('click','button#closepopover',function(){
+                    $('#budgetinfobutton').popover('hide');
+                });
 
                 $('#itembought').on('shown.bs.modal', function(){
-                    alert()
-                    $('#budgetinfobutton').attr('data-original-title','Current budget is '+_total); //var newTitle = "Here's my new title";
-                    // $('#MyExample').attr('data-original-title', newTitle);                    
+                    $('#budgetinfobutton').attr('data-original-title','Current budget is '+_total); 
                 });
                 function getItemsArrayForCategory(clickedCat){
                     for (var key in _drillDownArrJson){   
@@ -49,15 +40,9 @@
                 }
                 function drillDown(e){
                     var clickedSection=e.dataPoint["label"];
-                    var itemsArr= getItemsArrayForCategory(clickedSection);
-                    // e.chart.options.title = { text: e.dataPoint.name }
-                    //e.chart.render();
-                    //$("#backButton").toggleClass("invisible");
-
+                    var itemsArr= getItemsArrayForCategory(clickedSection);                   
                     $("#itemlist").modal("show");
-                    //LIST_OF_ITEMS_BOUGHT  itemsBoughtCardId
                     $('#itemsBoughtCardId').empty();  
-                    // $('#table').append($("#DRAGGABLE_ELEMENTS_TEMPLATE").tmpl(_obj));
                     $("#itemsBoughtCardId").append($("#LIST_OF_ITEMS_BOUGHT_TEMPLATE").tmpl(itemsArr));
                 }   
 
@@ -70,7 +55,6 @@
                             break;
                         }
                     }
-                    //  alert(catFoungFlag);
                     return catFoungFlag;
                 }
                 function iterateOverArrayOfJsonAndSplice(x,category){
@@ -115,15 +99,12 @@
                         "secret-key": '$2b$10$wViALK6fcTtVOJfffcaiHeVPEHlNt8KIzJhhFHdrxxmv.iE6v33x.'  
                     },
                     dataType: 'json',
-                    success: function (data) {
-                        // _data=data;removed
-                        // _arrData=data;
+                    success: function (data) {                       
                         convertDataToArrayOfJsonObjects(data);
                         displayChart();
                     }
                 });
                 function calculateCostForCategory(category,currCost){
-                    // var existingCost=_data[category];removed
                     var existingCost=_arrData[category];                    
                     existingCost=Number(existingCost)+Number(currCost);
                     return existingCost;
@@ -181,23 +162,14 @@
                 });
                 $('[data-toggle="popover"]').popover({
                     container: 'body',
-                    title: 'Search',
+                    title: 'search',
                     html: true,
                     placement: 'bottom',
                     sanitize: false,
                     content: function () {
                         return $("#PopoverContent").html();
                     }
-                });//https://stackoverflow.com/questions/16990573/how-to-bind-bootstrap-popover-on-dynamic-elements
-                   
-
-                    /*  $("#updatebudget").on("click",function(){
-                        _total=$("#newbudget").val();
-                        alert('updated');
-                    });*/
-
-                //})
-                   // .on('hidden.bs.popover', function() { alert('popover hidden')});;
+                });
             });                
 
         </script>
@@ -210,13 +182,15 @@
         <section>
             <div id="PopoverContent" class="d-none">
                 <div class="input-group">
-                    <input id="newbudget" type="text" class="form-control" placeholder="Current Budget"
+                    <input id="newbudget" type="text" class="form-control" placeholder="New Budget"
                            aria-label="Existing budget" aria-describedby="button-addon1">
                     <br>
                 </div><br>
                 <div class="input-group">
-                    <button id="updatebudget"  type="button" class="btn btn-primary">Apply</button>
+                    <button id="updatebudget"  type="button" class="btn btn-primary">Apply</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <button id="closepopover"  type="button" class="btn btn-primary">Close</button>
                 </div>
+
             </div>
         </section>
         <!-- Modal -->
@@ -224,9 +198,12 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="datewithstringmodalLabel">Name of you bin</h5>
+                        <h5 class="modal-title" id="datewithstringmodalLabel">Name of the item to be Added
+                        </h5>
+
                         <button id="budgetinfobutton" style="background-color:white"   data-toggle="popover" type="button" class="btn btn-default" aria-label="right Align">
-                            <i id="budgetinfo" class="fas icon-info-sign" title="Do you like my fa-coq icon?"></i>
+
+                            <i id="budgetinfo" class="fas icon-info-sign" title="update budget"></i>
                         </button>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
