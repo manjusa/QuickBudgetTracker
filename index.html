@@ -3,6 +3,8 @@
     <head>
 
         <script type="text/javascript" src="jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <script src="jquery.tmpl.js"></script>
@@ -12,7 +14,7 @@
         <script>
             var _total=18000;      
             var _arrData=[];
-            // var _data='';removed           
+            // var _data='';removed     https://stackoverflow.com/questions/55791417/bootstrap-4-input-field-in-popover      
             /* var _drillDownArrJson=[{
                 "label":"decor",
                 "items":[{
@@ -25,6 +27,17 @@
             }];   */
             var _drillDownArrJson=[];
             $(document).ready(function() { 
+                 $('body').on('click','button#updatebudget',function(){
+                     _total =$('.popover-body').find('#newbudget').val()
+
+                     alert(_total);
+                 });
+
+                $('#itembought').on('shown.bs.modal', function(){
+                    alert()
+                    $('#budgetinfobutton').attr('data-original-title','Current budget is '+_total); //var newTitle = "Here's my new title";
+                    // $('#MyExample').attr('data-original-title', newTitle);                    
+                });
                 function getItemsArrayForCategory(clickedCat){
                     for (var key in _drillDownArrJson){   
                         var currCat =_drillDownArrJson[key]["label"];
@@ -40,12 +53,14 @@
                     // e.chart.options.title = { text: e.dataPoint.name }
                     //e.chart.render();
                     //$("#backButton").toggleClass("invisible");
+
                     $("#itemlist").modal("show");
                     //LIST_OF_ITEMS_BOUGHT  itemsBoughtCardId
                     $('#itemsBoughtCardId').empty();  
                     // $('#table').append($("#DRAGGABLE_ELEMENTS_TEMPLATE").tmpl(_obj));
                     $("#itemsBoughtCardId").append($("#LIST_OF_ITEMS_BOUGHT_TEMPLATE").tmpl(itemsArr));
-                }               
+                }   
+
                 function isCategoryAlreadyExisting(cat){
                     var catFoungFlag=false;
                     for (var key in _arrData){   
@@ -164,6 +179,25 @@
                     displayChart();
 
                 });
+                $('[data-toggle="popover"]').popover({
+                    container: 'body',
+                    title: 'Search',
+                    html: true,
+                    placement: 'bottom',
+                    sanitize: false,
+                    content: function () {
+                        return $("#PopoverContent").html();
+                    }
+                });//https://stackoverflow.com/questions/16990573/how-to-bind-bootstrap-popover-on-dynamic-elements
+                   
+
+                    /*  $("#updatebudget").on("click",function(){
+                        _total=$("#newbudget").val();
+                        alert('updated');
+                    });*/
+
+                //})
+                   // .on('hidden.bs.popover', function() { alert('popover hidden')});;
             });                
 
         </script>
@@ -173,15 +207,26 @@
         <div style="margin-left: 5%;">
             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#itembought" >Add New Item</button>
         </div>
-
+        <section>
+            <div id="PopoverContent" class="d-none">
+                <div class="input-group">
+                    <input id="newbudget" type="text" class="form-control" placeholder="Current Budget"
+                           aria-label="Existing budget" aria-describedby="button-addon1">
+                    <br>
+                </div><br>
+                <div class="input-group">
+                    <button id="updatebudget"  type="button" class="btn btn-primary">Apply</button>
+                </div>
+            </div>
+        </section>
         <!-- Modal -->
-        <div class="modal fade" id="itembought" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="itembought" aria-hidden="true">
+        <div class="modal fade" id="itembought"  role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="itembought" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="datewithstringmodalLabel">Name of you bin</h5>
-                        <button style="background-color:white"   type="button" class="btn btn-default" aria-label="right Align">
-                            <i class="fas icon-info-sign" title="Do you like my fa-coq icon?"></i>
+                        <button id="budgetinfobutton" style="background-color:white"   data-toggle="popover" type="button" class="btn btn-default" aria-label="right Align">
+                            <i id="budgetinfo" class="fas icon-info-sign" title="Do you like my fa-coq icon?"></i>
                         </button>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
