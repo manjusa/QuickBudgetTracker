@@ -16,15 +16,22 @@
             var _arrData=[];           
             var _drillDownArrJson=[];
             $(document).ready(function() { 
+                $('#popovererror').hide();
                 $('body').on('click','button#updatebudget',function(){
                     var x= $('.popover-body').find('#newbudget').val();
                     if(x.length >0 && x>1000)//budget should be atleast 1000
                         _total=x;
+                    else{
+                        $("#popovererror").fadeTo(2000, 500).slideUp(500, function(){
+                            $("#popovererror").slideUp(500);
+                        });
+                    }
 
                 });
                 $('body').on('click','button#closepopover',function(){
                     $('#budgetinfobutton').popover('hide');
                 });
+
 
                 $('#itembought').on('shown.bs.modal', function(){
                     $('#budgetinfobutton').attr('data-original-title','Current budget is '+_total); 
@@ -175,6 +182,9 @@
         </script>
     </head>
     <body>
+        <div id="popovererror" class="alert alert-danger" role="alert" style="z-index: 9999;">
+            This is a danger alert—check it out!
+        </div>
         <div id="chartContainer" style="height: 300px; width: 100%;"></div>
         <div style="margin-left: 5%;">
             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#itembought" >Add New Item</button>
