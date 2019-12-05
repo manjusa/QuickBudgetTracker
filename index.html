@@ -16,7 +16,6 @@
             var _arrData=[];           
             var _drillDownArrJson=[];
             $(document).ready(function() { 
-                $('#popovererror').hide();
                 $('body').on('click','button#updatebudget',function(){
                     var x= $('.popover-body').find('#newbudget').val();
                     if(x.length >0 && x>1000)//budget should be atleast 1000
@@ -26,16 +25,17 @@
                             $("#popovererror").slideUp(500);
                         });
                     }
-
+                    $('#budgetinfobutton').popover('hide');
                 });
                 $('body').on('click','button#closepopover',function(){
                     $('#budgetinfobutton').popover('hide');
                 });
 
 
-                $('#itembought').on('shown.bs.modal', function(){
+               /* $('#itembought').on('shown.bs.modal', function(){
+                    alert(_total)
                     $('#budgetinfobutton').attr('data-original-title','Current budget is '+_total); 
-                });
+                });*/
                 function getItemsArrayForCategory(clickedCat){
                     for (var key in _drillDownArrJson){   
                         var currCat =_drillDownArrJson[key]["label"];
@@ -176,14 +176,21 @@
                     content: function () {
                         return $("#PopoverContent").html();
                     }
+                }).on('hidden.bs.popover',function(){
+                    $('#budgetinfobutton').attr('data-original-title',''); 
+                    $('#budgetinfobutton').attr('data-original-title','Current budget is '+_total); 
+
                 });
+                $('#popovererror').hide();
+
+
             });                
 
         </script>
     </head>
     <body>
-        <div id="popovererror" class="alert alert-danger" role="alert" style="z-index: 9999;">
-            This is a danger alert—check it out!
+        <div id="popovererror" class="alert alert-danger" role="alert">
+            Budget should be atleast 1000
         </div>
         <div id="chartContainer" style="height: 300px; width: 100%;"></div>
         <div style="margin-left: 5%;">
@@ -212,7 +219,6 @@
                         </h5>
 
                         <button id="budgetinfobutton" style="background-color:white"   data-toggle="popover" type="button" class="btn btn-default" aria-label="right Align">
-
                             <i id="budgetinfo" class="fas icon-info-sign" title="update budget"></i>
                         </button>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
