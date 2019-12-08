@@ -7,13 +7,13 @@
 
         <script src="js/bootstrap.min.js"></script>
         <link rel="stylesheet" href="css/bootstrap.min.css">
-        <script src="js/query.tmpl.js"></script>
+        <script src="js/jquery.tmpl.js"></script>
         <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
         <!--  <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">--->
 
         <script>
             var _total=18000;      
-            var _arrData=[];           
+            var _arrDataForChart=[];           
             var _drillDownArrJson=[];
             $(document).ready(function() { 
                 $('body').on('click','button#updatebudget',function(){
@@ -32,10 +32,19 @@
                 });
 
 
-               /* $('#itembought').on('shown.bs.modal', function(){
+                /* $('#itembought').on('shown.bs.modal', function(){
                     alert(_total)
                     $('#budgetinfobutton').attr('data-original-title','Current budget is '+_total); 
-                });*/
+                });
+
+                 var itemAdded={
+                        "name":currItem,
+                        "cost":currCost,
+                        "boughtfrom":boughtfrom
+                    }
+                    updateArrayForDrillDown(_drillDownArrJson,itemAdded,category); 
+
+                */
                 function getItemsArrayForCategory(clickedCat){
                     for (var key in _drillDownArrJson){   
                         var currCat =_drillDownArrJson[key]["label"];
@@ -53,10 +62,15 @@
                     $("#itemsBoughtCardId").append($("#LIST_OF_ITEMS_BOUGHT_TEMPLATE").tmpl(itemsArr));
                 }   
 
+                /*
+                {label:"furniture",y:55,55},
+                {label:"decor",y:27.77}
+
+                */
                 function isCategoryAlreadyExisting(cat){
                     var catFoungFlag=false;
-                    for (var key in _arrData){   
-                        var currCat =_arrData[key]["label"];
+                    for (var key in _arrDataForChart){   
+                        var currCat =_arrDataForChart[key]["label"];
                         if(currCat==cat){
                             catFoungFlag=true;
                             break;
@@ -64,6 +78,11 @@
                     }
                     return catFoungFlag;
                 }
+                /*
+                {label:"furniture",y:55,55},
+                {label:"decor",y:27.77}
+
+                */
                 function iterateOverArrayOfJsonAndSplice(x,category){
                     for (var j=0;j<x.length;j++){
                         if(x[j]["label"]==category){
@@ -75,32 +94,38 @@
                 function updateArray(x,currItemCost,category){
                     var l = {
                         label:category,
-                        y:(currItemCost*100/_total)  
+                        y:(currItemCost*100/_total)                        
                     }
                     x.push(l);
                 }
-                function updateArrayForDrillDown(existingArr,objtoBeAdded,cat){                 
+                function updateArrayForDrillDown(existingArr,objtoBeAdded,cat,boughfrom){                 
                     existingArr.push(objtoBeAdded);                   
                 }
+                /*
+                convertDataToArrayOfJsonObjects is the callback after reading data
+                Look at readme.md for sample response
+                */
                 function convertDataToArrayOfJsonObjects(data){
                     var totalCostOfAllCat=0;
-                    for (var key in data){   
+                    var allitems=data.items;                    
+                    for (var key in allitems){   
                         var cat =key;
-                        var cost=Number(data[key]);
+                        var cost=Number(allitems[key]);
                         totalCostOfAllCat+=cost;
                         var l = {
                             label:key,
-                            y:(data[key]*100/_total)
+                            y:(allitems[key]*100/_total)
                         }
-                        _arrData.push(l);
-                    }
+                        _arrDataForChart.push(l);
+                    }                  
                     var remaining=_total-totalCostOfAllCat;
-                    iterateOverArrayOfJsonAndSplice(_arrData,"remaining");
-                    updateArray(_arrData,remaining,"remaining");                    
+                    iterateOverArrayOfJsonAndSplice(_arrDataForChart,"remaining");
+                    updateArray(_arrDataForChart,remaining,"remaining"); 
+                    updateArrayForDrillDown(_drillDownArrJson);
                 }
 
                 $.ajax({
-                    url: 'https://api.jsonbin.io/b/5ddb6199264e8f39a7bb91d6/latest',
+                    url: 'https://api.jsonbin.io/b/5dec7546bc5ffd040095b721/latest',
                     type: 'GET',//5ddb6199264e8f39a7bb91d6                        
                     headers: {
                         "secret-key": '$2b$10$wViALK6fcTtVOJfffcaiHeVPEHlNt8KIzJhhFHdrxxmv.iE6v33x.'  
@@ -112,15 +137,16 @@
                     }
                 });
                 function calculateCostForCategory(category,currCost){
-                    var existingCost=_arrData[category];                    
+                    var existingCost=_arrDataForChart[category];                    
                     existingCost=Number(existingCost)+Number(currCost);
                     return existingCost;
                 }
                 $("#submitOfItem").on("click",function(){
                     var currCost=$("#costofitem").val();
                     var category=$("#category").val();
+                    var boughtfrom=$("#boughtfrom").val();
                     var currItem=$("#itemname").val();
-                    if(currCost.length>0 &&category.length>0 &&currItem.length>0){
+                    if(currCost.length>0 &&category.length>0 &&currItem.length>0 &&boughtfrom.length>0){
                         $("#errormessage").hide();
                     }
                     else{
@@ -129,15 +155,16 @@
                     }
                     if(isCategoryAlreadyExisting(category)){
                         var calculateCostSoFarForCat=calculateCostForCategory(category,currCost);
-                        iterateOverArrayOfJsonAndSplice(_arrData,category);                       
-                        updateArray(_arrData,calculateCostSoFarForCat,category); 
+                        iterateOverArrayOfJsonAndSplice(_arrDataForChart,category);                       
+                        updateArray(_arrDataForChart,calculateCostSoFarForCat,category); 
                     }
                     else{
-                        updateArray(_arrData,currCost,category);                         
+                        updateArray(_arrDataForChart,currCost,category);                         
                     }
                     var itemAdded={
                         "name":currItem,
-                        "cost":currCost
+                        "cost":currCost,
+                        "boughtfrom":boughtfrom
                     }
                     updateArrayForDrillDown(_drillDownArrJson,itemAdded,category); 
                     $("#itembought").modal("hide");
@@ -158,7 +185,7 @@
                             showInLegend: true,
                             legendText: "{label}",
                             indexLabel: "{label}: #percent%",                           
-                            dataPoints: _arrData
+                            dataPoints: _arrDataForChart
                         }] 
                     };
                     $("#chartContainer").CanvasJSChart(options);
@@ -232,7 +259,7 @@
                         </div>
                         <form crole="form">
                             <div class="form-group">
-                                <label for="costofitem" class="col-form-label">Category</label>
+                                <label for="category" class="col-form-label">Category</label>
                                 <select id="category" class="mdb-select md-form">
                                     <option value="" disabled selected>SELECT</option>
                                     <option value="furniture">Furniture</option>
@@ -249,6 +276,10 @@
                             <div class="form-group">
                                 <label for="costofitem" class="col-form-label">Cost</label>
                                 <input type="text"   id="costofitem" style="margin-left: 28px">
+                            </div>
+                            <div class="form-group">
+                                <label for="boughtfrom" class="col-form-label">Bought From</label>
+                                <input type="text"   id="boughtfrom" style="margin-left: 28px">
                             </div>
                         </form> 
                     </div>
