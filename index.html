@@ -15,6 +15,7 @@
             var _total=18000;      
             var _arrDataForChart=[];           
             var _drillDownArrJson=[];
+            var _arrDataForChartForDisplay=[];
             $(document).ready(function() { 
                 $('body').on('click','button#updatebudget',function(){
                     var x= $('.popover-body').find('#newbudget').val();
@@ -67,10 +68,10 @@
                 {label:"decor",y:27.77}
 
                 */
-                function isCategoryAlreadyExisting(cat){
+                function isCategoryAlreadyExisting(currArr,cat){
                     var catFoungFlag=false;
-                    for (var key in _arrDataForChart){   
-                        var currCat =_arrDataForChart[key]["label"];
+                    for (var key in currArr){   
+                        var currCat =currArr[key]["label"];
                         if(currCat==cat){
                             catFoungFlag=true;
                             break;
@@ -98,16 +99,62 @@
                     }
                     x.push(l);
                 }
-                function updateArrayForDrillDown(existingArr,objtoBeAdded,cat,boughfrom){                 
-                    existingArr.push(objtoBeAdded);                   
+                /*                
+
+                "itemdetails":{
+                      "furniture": [
+                        {
+                          "name": "harddisk",
+                          "cost": "5000",
+                          "boughtfrom": "kogan"
+                        },
+                        {
+                          "name": "teapoi",
+                          "cost": "3000",
+                          "boughtfrom": "kogan"
+                        }
+                      ],
+                      "decors": [
+                        {
+                          "name": "harddisk",
+                          "cost": "5000",
+                          "boughtfrom": "kogan"
+                        },
+                        {
+                          "name": "teapoi",
+                          "cost": "3000",
+                          "boughtfrom": "kogan"
+                        }
+                      ]
+                      }
+                */
+                function updateCategoryWithNewItem(objtoBeAdded){
+
                 }
+                function getArrayForCurrentCategory(arr,cat){
+                    return arr[cat];
+                }
+                /* function updateArrayForDrillDown(existingArr,cat){  
+                    var foundflag;
+                    for(var k in existingArr){
+                        foundflag=isCategoryAlreadyExisting(cat);
+                        if(foundflag){
+                            spliceCurrentCatArr(cat);
+                            updateCategoryWithNewItem(existingArr[k]);
+                        }
+                        else{
+                            // existingArr.push(objtoBeAdded);
+                        }
+                    }
+                }*/
                 /*
                 convertDataToArrayOfJsonObjects is the callback after reading data
                 Look at readme.md for sample response
                 */
                 function convertDataToArrayOfJsonObjects(data){
                     var totalCostOfAllCat=0;
-                    var allitems=data.items;                    
+                    var allitems=data.items;   
+                    _drillDownArrJson=data.itemdetails;
                     for (var key in allitems){   
                         var cat =key;
                         var cost=Number(allitems[key]);
@@ -121,7 +168,6 @@
                     var remaining=_total-totalCostOfAllCat;
                     iterateOverArrayOfJsonAndSplice(_arrDataForChart,"remaining");
                     updateArray(_arrDataForChart,remaining,"remaining"); 
-                    updateArrayForDrillDown(_drillDownArrJson);
                 }
 
                 $.ajax({
@@ -153,7 +199,8 @@
                         $("#errormessage").show();
                         return;
                     }
-                    if(isCategoryAlreadyExisting(category)){
+                    //just computes cost.Also updates array for displaying the pie chart
+                    if(isCategoryAlreadyExisting(_arrDataForChart,category)){
                         var calculateCostSoFarForCat=calculateCostForCategory(category,currCost);
                         iterateOverArrayOfJsonAndSplice(_arrDataForChart,category);                       
                         updateArray(_arrDataForChart,calculateCostSoFarForCat,category); 
@@ -161,12 +208,29 @@
                     else{
                         updateArray(_arrDataForChart,currCost,category);                         
                     }
-                    var itemAdded={
-                        "name":currItem,
-                        "cost":currCost,
-                        "boughtfrom":boughtfrom
+                    //Updates array drilldownArrJson.This array is used to drill down into each category
+                    //this array will be used the detailed modal info
+                    if(isCategoryAlreadyExisting(_drillDownArrJson,category)){
+                        var currCatArr=getArrayForCurrentCategory(_drillDownArrJson,category);
+                        var itemAdded={
+                            "name":currItem,
+                            "cost":currCost,
+                            "boughtfrom":boughtfrom
+                        }
+                        currCatArr.push(itemAdded);
+                        // updateArrayForDrillDown(_drillDownArrJson,category); 
                     }
-                    updateArrayForDrillDown(_drillDownArrJson,itemAdded,category); 
+                    else{
+                      //  var currCatArr=[]; 
+                        var itemAdded={
+                            "name":currItem,
+                            "cost":currCost,
+                            "boughtfrom":boughtfrom
+                        }
+                       // currCatArr.push(itemAdded);
+                        _drillDownArrJson = {..._drillDownArrJson, category:[itemAdded]};
+                    }
+
                     $("#itembought").modal("hide");
                     displayChart();
                 });
@@ -263,7 +327,7 @@
                                 <select id="category" class="mdb-select md-form">
                                     <option value="" disabled selected>SELECT</option>
                                     <option value="furniture">Furniture</option>
-                                    <option value="decor">Decor</option>
+                                    <option value="decors">Decor</option>
                                     <option value="appliances">Appliances</option>
                                     <option value="utensils">Utensils</option>
                                     <option value="other">Other</option>

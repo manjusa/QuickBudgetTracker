@@ -1,4 +1,5 @@
 {
+"itemdetails":{
   "furniture": [
     {
       "name": "harddisk",
@@ -22,7 +23,8 @@
       "cost": "3000",
       "boughtfrom": "kogan"
     }
-  ],
+  ]
+  },
   "items": 
     {
       "furniture": "1000",
@@ -34,3 +36,6 @@
 _data= [{label: "furniture"
 y: 55.55555555555556}
 ]
+
+//line 210,  if(isCategoryAlreadyExisting(category)){
+updateArrayForDrillDown line 136
