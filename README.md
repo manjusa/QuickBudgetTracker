@@ -28,7 +28,8 @@
   "items": 
     {
       "furniture": "1000",
-      "decors": "5000"
+      "decors": "5000",
+      "remaining":"3000"
     }
   
 }

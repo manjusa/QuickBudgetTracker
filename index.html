@@ -71,8 +71,9 @@
                 function isCategoryAlreadyExisting(currArr,cat){
                     var catFoungFlag=false;
                     for (var key in currArr){   
-                        var currCat =currArr[key]["label"];
-                        if(currCat==cat){
+                       // var currCat =currArr[key]["label"];
+                       // var currCat =currArr[key];
+                        if(key==cat){
                             catFoungFlag=true;
                             break;
                         }
@@ -84,20 +85,12 @@
                 {label:"decor",y:27.77}
 
                 */
-                function iterateOverArrayOfJsonAndSplice(x,category){
-                    for (var j=0;j<x.length;j++){
-                        if(x[j]["label"]==category){
-                            x.splice(j,1);
-                            break;
-                        }                           
-                    }   
-                }
+               /* function iterateOverArrayOfJsonAndSplice(x,category){
+                    x[category]="5012";
+
+                }*/
                 function updateArray(x,currItemCost,category){
-                    var l = {
-                        label:category,
-                        y:(currItemCost*100/_total)                        
-                    }
-                    x.push(l);
+                   x[category]=currItemCost+'';
                 }
                 /*                
 
@@ -128,9 +121,7 @@
                       ]
                       }
                 */
-                function updateCategoryWithNewItem(objtoBeAdded){
-
-                }
+               
                 function getArrayForCurrentCategory(arr,cat){
                     return arr[cat];
                 }
@@ -152,10 +143,11 @@
                 Look at readme.md for sample response
                 */
                 function convertDataToArrayOfJsonObjects(data){
-                    var totalCostOfAllCat=0;
-                    var allitems=data.items;   
+                    // var totalCostOfAllCat=0;
+                    // var allitems=data.items;   
+                    _arrDataForChart=data.items;
                     _drillDownArrJson=data.itemdetails;
-                    for (var key in allitems){   
+                    /*  for (var key in allitems){   
                         var cat =key;
                         var cost=Number(allitems[key]);
                         totalCostOfAllCat+=cost;
@@ -167,7 +159,44 @@
                     }                  
                     var remaining=_total-totalCostOfAllCat;
                     iterateOverArrayOfJsonAndSplice(_arrDataForChart,"remaining");
-                    updateArray(_arrDataForChart,remaining,"remaining"); 
+                    updateArray(_arrDataForChart,remaining,"remaining"); */
+                }
+                function getRemaining(){
+                    var remaining=0;
+                    var totalCostOfAllCat=0;
+                     for (var key in _arrDataForChart){  
+                      if(key!="remaining"){
+                        var cat =key;
+                        var cost=Number(_arrDataForChart[key]);
+                        totalCostOfAllCat+=cost;
+                      }
+                     }
+                    remaining=_total-totalCostOfAllCat;
+                    return remaining;
+
+                }
+                function updateRemaining(x){
+                    var rem=getRemaining();
+                    updateArray(x,rem,"remaining");
+                }
+                
+                function getArrayForDisplaying(){
+                    var displayArr=[];
+                    var totalCostOfAllCat=0;
+                    for (var key in _arrDataForChart){   
+                        var cat =key;
+                        var cost=Number(_arrDataForChart[key]);
+                        totalCostOfAllCat+=cost;
+                        var l = {
+                            label:key,
+                            y:(_arrDataForChart[key]*100/_total)
+                        }
+                        displayArr.push(l);
+                    } 
+                   // var remaining=_total-totalCostOfAllCat;
+                   // iterateOverArrayOfJsonAndSplice(displayArr,"remaining");
+                  //  updateArray(displayArr,remaining,"remaining");
+                    return displayArr;
                 }
 
                 $.ajax({
@@ -202,11 +231,14 @@
                     //just computes cost.Also updates array for displaying the pie chart
                     if(isCategoryAlreadyExisting(_arrDataForChart,category)){
                         var calculateCostSoFarForCat=calculateCostForCategory(category,currCost);
-                        iterateOverArrayOfJsonAndSplice(_arrDataForChart,category);                       
+                       // iterateOverArrayOfJsonAndSplice(_arrDataForChart,category);   x[category]=currItemCost+'';                     
                         updateArray(_arrDataForChart,calculateCostSoFarForCat,category); 
+                        updateRemaining(_arrDataForChart);
                     }
                     else{
-                        updateArray(_arrDataForChart,currCost,category);                         
+                       // updateArray(_arrDataForChart,currCost,category); 
+                        _arrDataForChart = {..._arrDataForChart, [category]:currCost};
+                        updateRemaining(_arrDataForChart);
                     }
                     //Updates array drilldownArrJson.This array is used to drill down into each category
                     //this array will be used the detailed modal info
@@ -218,20 +250,18 @@
                             "boughtfrom":boughtfrom
                         }
                         currCatArr.push(itemAdded);
-                        // updateArrayForDrillDown(_drillDownArrJson,category); 
                     }
                     else{
-                      //  var currCatArr=[]; 
                         var itemAdded={
                             "name":currItem,
                             "cost":currCost,
                             "boughtfrom":boughtfrom
                         }
-                       // currCatArr.push(itemAdded);
-                        _drillDownArrJson = {..._drillDownArrJson, category:[itemAdded]};
+                        _drillDownArrJson = {..._drillDownArrJson, [category]:[itemAdded]};
                     }
 
                     $("#itembought").modal("hide");
+                    
                     displayChart();
                 });
 
@@ -249,7 +279,7 @@
                             showInLegend: true,
                             legendText: "{label}",
                             indexLabel: "{label}: #percent%",                           
-                            dataPoints: _arrDataForChart
+                            dataPoints: getArrayForDisplaying()
                         }] 
                     };
                     $("#chartContainer").CanvasJSChart(options);
