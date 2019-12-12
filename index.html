@@ -16,7 +16,13 @@
             var _arrDataForChart=[];           
             var _drillDownArrJson=[];
             var _arrDataForChartForDisplay=[];
-            $(document).ready(function() { 
+            $(document).ready(function() {      
+                $('#itemlist').on('show.bs.modal', function (event) {
+                    $("#headerval").text('');
+                    var clickedSection=$("#itemsBoughtCardId").data("category");
+                    // alert(clickedSection)
+                    $("#headerval").text("Items for "+clickedSection+" are:");
+                });
                 $('body').on('click','button#updatebudget',function(){
                     var x= $('.popover-body').find('#newbudget').val();
                     if(x.length >0 && x>1000)//budget should be atleast 1000
@@ -48,8 +54,7 @@
                 */
                 function getItemsArrayForCategory(clickedCat){
                     for (var key in _drillDownArrJson){   
-                        var currCat =_drillDownArrJson[key]["label"];
-                        if(currCat==clickedCat){
+                        if(key == clickedCat){
                             return _drillDownArrJson[key];
                         }
                     }
@@ -57,10 +62,12 @@
                 }
                 function drillDown(e){
                     var clickedSection=e.dataPoint["label"];
-                    var itemsArr= getItemsArrayForCategory(clickedSection);                   
-                    $("#itemlist").modal("show");
+                    var itemsArr= getItemsArrayForCategory(clickedSection); 
                     $('#itemsBoughtCardId').empty();  
-                    $("#itemsBoughtCardId").append($("#LIST_OF_ITEMS_BOUGHT_TEMPLATE").tmpl(itemsArr));
+                    $("#itemsBoughtCardId").data("category",clickedSection);
+                    $("#itemsBoughtCardId").append($("#LIST_OF_ITEMS_BOUGHT_TEMPLATE").tmpl(itemsArr));  
+                    $("#itemlist").modal("show");
+
                 }   
 
                 /*
@@ -71,8 +78,8 @@
                 function isCategoryAlreadyExisting(currArr,cat){
                     var catFoungFlag=false;
                     for (var key in currArr){   
-                       // var currCat =currArr[key]["label"];
-                       // var currCat =currArr[key];
+                        // var currCat =currArr[key]["label"];
+                        // var currCat =currArr[key];
                         if(key==cat){
                             catFoungFlag=true;
                             break;
@@ -85,12 +92,12 @@
                 {label:"decor",y:27.77}
 
                 */
-               /* function iterateOverArrayOfJsonAndSplice(x,category){
+                /* function iterateOverArrayOfJsonAndSplice(x,category){
                     x[category]="5012";
 
                 }*/
                 function updateArray(x,currItemCost,category){
-                   x[category]=currItemCost+'';
+                    x[category]=currItemCost+'';
                 }
                 /*                
 
@@ -121,7 +128,7 @@
                       ]
                       }
                 */
-               
+
                 function getArrayForCurrentCategory(arr,cat){
                     return arr[cat];
                 }
@@ -164,13 +171,13 @@
                 function getRemaining(){
                     var remaining=0;
                     var totalCostOfAllCat=0;
-                     for (var key in _arrDataForChart){  
-                      if(key!="remaining"){
-                        var cat =key;
-                        var cost=Number(_arrDataForChart[key]);
-                        totalCostOfAllCat+=cost;
-                      }
-                     }
+                    for (var key in _arrDataForChart){  
+                        if(key!="remaining"){
+                            var cat =key;
+                            var cost=Number(_arrDataForChart[key]);
+                            totalCostOfAllCat+=cost;
+                        }
+                    }
                     remaining=_total-totalCostOfAllCat;
                     return remaining;
 
@@ -179,7 +186,7 @@
                     var rem=getRemaining();
                     updateArray(x,rem,"remaining");
                 }
-                
+
                 function getArrayForDisplaying(){
                     var displayArr=[];
                     var totalCostOfAllCat=0;
@@ -193,9 +200,9 @@
                         }
                         displayArr.push(l);
                     } 
-                   // var remaining=_total-totalCostOfAllCat;
-                   // iterateOverArrayOfJsonAndSplice(displayArr,"remaining");
-                  //  updateArray(displayArr,remaining,"remaining");
+                    // var remaining=_total-totalCostOfAllCat;
+                    // iterateOverArrayOfJsonAndSplice(displayArr,"remaining");
+                    //  updateArray(displayArr,remaining,"remaining");
                     return displayArr;
                 }
 
@@ -231,12 +238,12 @@
                     //just computes cost.Also updates array for displaying the pie chart
                     if(isCategoryAlreadyExisting(_arrDataForChart,category)){
                         var calculateCostSoFarForCat=calculateCostForCategory(category,currCost);
-                       // iterateOverArrayOfJsonAndSplice(_arrDataForChart,category);   x[category]=currItemCost+'';                     
+                        // iterateOverArrayOfJsonAndSplice(_arrDataForChart,category);   x[category]=currItemCost+'';                     
                         updateArray(_arrDataForChart,calculateCostSoFarForCat,category); 
                         updateRemaining(_arrDataForChart);
                     }
                     else{
-                       // updateArray(_arrDataForChart,currCost,category); 
+                        // updateArray(_arrDataForChart,currCost,category); 
                         _arrDataForChart = {..._arrDataForChart, [category]:currCost};
                         updateRemaining(_arrDataForChart);
                     }
@@ -261,7 +268,7 @@
                     }
 
                     $("#itembought").modal("hide");
-                    
+
                     displayChart();
                 });
 
@@ -388,34 +395,36 @@
 
 
         <!-- Modal -->
-        <div class="modal fade" id="itemlist" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="itemlist" aria-hidden="true">
+        <div class="modal fade" id="itemlist" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="itemlist" aria-hidden="true">            
             <div class="modal-dialog" role="document">
-                <div  id="itemsBoughtCardId" class="modal-content">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="datewithstringmodalLabel"><span id="headerval"></span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div  id="itemsBoughtCardId" data-category="" class="modal-body">
 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
                 </div>
-
             </div>
         </div>
         <script src="js/jquery.canvasjs.min.js"></script>
 
         <script id="LIST_OF_ITEMS_BOUGHT_TEMPLATE" type="text/x-jquery-tmpl">
-            <div class="modal-header">
-                <h5 class="modal-title" id="datewithstringmodalLabel">Items bought for ${label} are</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-            </button>
-            </div>
+
             <div class="modal-body">
                     <ul>                       
-                             {{each items}}
-                               <li>  Item name is ${name} and Cost of the item is ${cost} </li>  
-                             {{/each}}                        
+                               <li> <p>Item name is <b>${name}</b> and Cost of the item is <b>${cost}</b> and bought from <b>${boughtfrom}</b></p>
+            </li>  
             </ul>
 
             </div>
-            <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
+
 
         </script>
     </body>
