@@ -237,13 +237,11 @@
                     }
                     //just computes cost.Also updates array for displaying the pie chart
                     if(isCategoryAlreadyExisting(_arrDataForChart,category)){
-                        var calculateCostSoFarForCat=calculateCostForCategory(category,currCost);
-                        // iterateOverArrayOfJsonAndSplice(_arrDataForChart,category);   x[category]=currItemCost+'';                     
+                        var calculateCostSoFarForCat=calculateCostForCategory(category,currCost);                                         
                         updateArray(_arrDataForChart,calculateCostSoFarForCat,category); 
                         updateRemaining(_arrDataForChart);
                     }
                     else{
-                        // updateArray(_arrDataForChart,currCost,category); 
                         _arrDataForChart = {..._arrDataForChart, [category]:currCost};
                         updateRemaining(_arrDataForChart);
                     }
@@ -268,10 +266,25 @@
                     }
 
                     $("#itembought").modal("hide");
-
+                    //  updateItems();
                     displayChart();
                 });
+                function updateItems(){
 
+                    let req = new XMLHttpRequest();
+
+                    req.onreadystatechange = () => {
+                        if (req.readyState == XMLHttpRequest.DONE) {
+                            console.log(req.responseText);
+                        }
+                    };
+
+                    req.open("PUT", "https://api.jsonbin.io/b/5dec7546bc5ffd040095b721", true);
+                    req.setRequestHeader("Content-type", "application/json");
+                    req.setRequestHeader("secret-key", "$2b$10$wViALK6fcTtVOJfffcaiHeVPEHlNt8KIzJhhFHdrxxmv.iE6v33x.");
+                    req.send(JSON.stringify(_arrDataForChart));
+
+                }
 
                 function displayChart(){
                     var options = {
