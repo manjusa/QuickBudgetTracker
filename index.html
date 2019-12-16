@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+(<!DOCTYPE HTML>
 <html>
     <head>
 
@@ -20,6 +20,12 @@
                 $('#itemlist').on('show.bs.modal', function (event) {
                     $("#headerval").text('');
                     var clickedSection=$("#itemsBoughtCardId").data("category");
+                    if(clickedSection=="remaining"){
+                        $(this).find('#itemsBoughtCardId').empty();//$('#foo').find(':first');
+                        $(this).find('#itemsBoughtCardHeaderId').text("Remaining");
+                        (this).find('#itemsBoughtCardId').text("Total amount remaining after all upir expenses is  "+getRemaining());
+                        //$(this).find('.modal-body')
+                    }
                     // alert(clickedSection)
                     $("#headerval").text("Items for "+clickedSection+" are:");
                 });
@@ -207,13 +213,13 @@
                 }
 
                 $.ajax({
-                    url: 'https://api.jsonbin.io/b/5dec7546bc5ffd040095b721/latest',
+                    url: 'https://api.jsonbin.io/b/5df739ef2c714135cda222fd/latest',
                     type: 'GET',//5ddb6199264e8f39a7bb91d6                        
                     headers: {
                         "secret-key": '$2b$10$wViALK6fcTtVOJfffcaiHeVPEHlNt8KIzJhhFHdrxxmv.iE6v33x.'  
                     },
                     dataType: 'json',
-                    success: function (data) {                       
+                    success: function (data) {                 
                         convertDataToArrayOfJsonObjects(data);
                         displayChart();
                     }
@@ -266,7 +272,7 @@
                     }
 
                     $("#itembought").modal("hide");
-                    //  updateItems();
+                    updateItems();
                     displayChart();
                 });
                 function updateItems(){
@@ -279,7 +285,7 @@
                         }
                     };
 
-                    req.open("PUT", "https://api.jsonbin.io/b/5dec7546bc5ffd040095b721", true);
+                    req.open("PUT", "https://api.jsonbin.io/b/5df739ef2c714135cda222fd", true);
                     req.setRequestHeader("Content-type", "application/json");
                     req.setRequestHeader("secret-key", "$2b$10$wViALK6fcTtVOJfffcaiHeVPEHlNt8KIzJhhFHdrxxmv.iE6v33x.");
                     req.send(JSON.stringify(_arrDataForChart));
@@ -411,7 +417,7 @@
         <div class="modal fade" id="itemlist" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="itemlist" aria-hidden="true">            
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div id="itemsBoughtCardHeaderId" class="modal-header">
                         <h5 class="modal-title" id="datewithstringmodalLabel"><span id="headerval"></span></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
