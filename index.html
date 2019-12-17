@@ -24,9 +24,7 @@
                         $(this).find('#itemsBoughtCardId').empty();//$('#foo').find(':first');
                         $(this).find('#itemsBoughtCardHeaderId').text("Remaining");
                         (this).find('#itemsBoughtCardId').text("Total amount remaining after all upir expenses is  "+getRemaining());
-                        //$(this).find('.modal-body')
                     }
-                    // alert(clickedSection)
                     $("#headerval").text("Items for "+clickedSection+" are:");
                 });
                 $('body').on('click','button#updatebudget',function(){
@@ -44,20 +42,6 @@
                     $('#budgetinfobutton').popover('hide');
                 });
 
-
-                /* $('#itembought').on('shown.bs.modal', function(){
-                    alert(_total)
-                    $('#budgetinfobutton').attr('data-original-title','Current budget is '+_total); 
-                });
-
-                 var itemAdded={
-                        "name":currItem,
-                        "cost":currCost,
-                        "boughtfrom":boughtfrom
-                    }
-                    updateArrayForDrillDown(_drillDownArrJson,itemAdded,category); 
-
-                */
                 function getItemsArrayForCategory(clickedCat){
                     for (var key in _drillDownArrJson){   
                         if(key == clickedCat){
@@ -73,14 +57,8 @@
                     $("#itemsBoughtCardId").data("category",clickedSection);
                     $("#itemsBoughtCardId").append($("#LIST_OF_ITEMS_BOUGHT_TEMPLATE").tmpl(itemsArr));  
                     $("#itemlist").modal("show");
-
                 }   
 
-                /*
-                {label:"furniture",y:55,55},
-                {label:"decor",y:27.77}
-
-                */
                 function isCategoryAlreadyExisting(currArr,cat){
                     var catFoungFlag=false;
                     for (var key in currArr){   
@@ -92,87 +70,20 @@
                         }
                     }
                     return catFoungFlag;
-                }
-                /*
-                {label:"furniture",y:55,55},
-                {label:"decor",y:27.77}
-
-                */
-                /* function iterateOverArrayOfJsonAndSplice(x,category){
-                    x[category]="5012";
-
-                }*/
+                }               
                 function updateArray(x,currItemCost,category){
                     x[category]=currItemCost+'';
-                }
-                /*                
-
-                "itemdetails":{
-                      "furniture": [
-                        {
-                          "name": "harddisk",
-                          "cost": "5000",
-                          "boughtfrom": "kogan"
-                        },
-                        {
-                          "name": "teapoi",
-                          "cost": "3000",
-                          "boughtfrom": "kogan"
-                        }
-                      ],
-                      "decors": [
-                        {
-                          "name": "harddisk",
-                          "cost": "5000",
-                          "boughtfrom": "kogan"
-                        },
-                        {
-                          "name": "teapoi",
-                          "cost": "3000",
-                          "boughtfrom": "kogan"
-                        }
-                      ]
-                      }
-                */
-
+                }               
                 function getArrayForCurrentCategory(arr,cat){
                     return arr[cat];
-                }
-                /* function updateArrayForDrillDown(existingArr,cat){  
-                    var foundflag;
-                    for(var k in existingArr){
-                        foundflag=isCategoryAlreadyExisting(cat);
-                        if(foundflag){
-                            spliceCurrentCatArr(cat);
-                            updateCategoryWithNewItem(existingArr[k]);
-                        }
-                        else{
-                            // existingArr.push(objtoBeAdded);
-                        }
-                    }
-                }*/
+                }               
                 /*
                 convertDataToArrayOfJsonObjects is the callback after reading data
                 Look at readme.md for sample response
                 */
-                function convertDataToArrayOfJsonObjects(data){
-                    // var totalCostOfAllCat=0;
-                    // var allitems=data.items;   
+                function convertDataToArrayOfJsonObjects(data){                      
                     _arrDataForChart=data.items;
-                    _drillDownArrJson=data.itemdetails;
-                    /*  for (var key in allitems){   
-                        var cat =key;
-                        var cost=Number(allitems[key]);
-                        totalCostOfAllCat+=cost;
-                        var l = {
-                            label:key,
-                            y:(allitems[key]*100/_total)
-                        }
-                        _arrDataForChart.push(l);
-                    }                  
-                    var remaining=_total-totalCostOfAllCat;
-                    iterateOverArrayOfJsonAndSplice(_arrDataForChart,"remaining");
-                    updateArray(_arrDataForChart,remaining,"remaining"); */
+                    _drillDownArrJson=data.itemdetails;                  
                 }
                 function getRemaining(){
                     var remaining=0;
@@ -206,9 +117,7 @@
                         }
                         displayArr.push(l);
                     } 
-                    // var remaining=_total-totalCostOfAllCat;
-                    // iterateOverArrayOfJsonAndSplice(displayArr,"remaining");
-                    //  updateArray(displayArr,remaining,"remaining");
+                  
                     return displayArr;
                 }
 
@@ -276,6 +185,7 @@
                     displayChart();
                 });
                 function updateItems(){
+                    var jsonToUpdate={};
 
                     let req = new XMLHttpRequest();
 
@@ -288,7 +198,11 @@
                     req.open("PUT", "https://api.jsonbin.io/b/5df739ef2c714135cda222fd", true);
                     req.setRequestHeader("Content-type", "application/json");
                     req.setRequestHeader("secret-key", "$2b$10$wViALK6fcTtVOJfffcaiHeVPEHlNt8KIzJhhFHdrxxmv.iE6v33x.");
-                    req.send(JSON.stringify(_arrDataForChart));
+                    jsonToUpdate={
+                        "items":_arrDataForChart,
+                        "itemdetails":_drillDownArrJson
+                    }
+                    req.send(JSON.stringify(jsonToUpdate));
 
                 }
 
