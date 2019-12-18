@@ -1,3 +1,12 @@
+--sample json
+
+{
+  "items": {
+    "remaining": "18000"
+  }
+}
+submit in below format
+---
 {
 "itemdetails":{
   "furniture": [
