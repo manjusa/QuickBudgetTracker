@@ -2,10 +2,11 @@
 This shows how the json format is at the beginning
 
 2) Once you update and add new items ,JSON will be updated - sampleUpdatedJSON
-In this sample json, we have two keys
-"itemdetails" and "items"
+In this sample json, we have three keys
+"itemdetails","items","total"
 "items" are used for displaying chart on load of the page.
 "itemdetails" on the otherhand are for drill down and viewing items in more detail
+"total" is the total budget set
 
 3)We use jquery canvas to display chart. It requires data in below format (as shown in data below)
 _data= [{label: "furniture"
