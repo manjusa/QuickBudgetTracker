@@ -26,10 +26,8 @@
                         $(this).find('#itemsBoughtCardId').text("Total amount remaining after all your expenses is  "+getRemaining());
                     }
                     else{
-                      //  $(this).find('#itemsBoughtCardId').empty();//$('#foo').find(':first');
                         $(this).find('#itemsBoughtCardHeaderId #headerval').text("Items for "+clickedSection+" are:");
                     }
-                  // $("#headerval").text("Items for "+clickedSection+" are:");
                 });
                 $('body').on('click','button#updatebudget',function(){
                     var x= $('.popover-body').find('#newbudget').val();
