@@ -1,11 +1,22 @@
-We will learn various options to create dates
-11 means dec
-default format of Date
+1)Sample initial json -sampleInitialJSON
+This shows how the json format is at the beginning
 
-_arrData eg
-_arrData=[
+2) Once you update and add new items ,JSON will be updated - sampleUpdatedJSON
+In this sample json, we have two keys
+"itemdetails" and "items"
+"items" are used for displaying chart on load of the page.
+"itemdetails" on the otherhand are for drill down and viewing items in more detail
 
-{label:"furniture",y:55,55},
-{label:"decor",y:27.77}
-
+3)We use jquery canvas to display chart. It requires data in below format (as shown in data below)
+_data= [{label: "furniture"
+y: 55.55555555555556}
 ]
+
+4) We have two variables which we use for displaychart and drilldown. These variables 
+are "_arrayOfDataChart" and "_drillDownArrayJson" respectively. Below is a sample of them
+
+
+
+
+
+

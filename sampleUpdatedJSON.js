@@ -1,12 +1,3 @@
---sample json
-
-{
-  "items": {
-    "remaining": "18000"
-  }
-}
-submit in below format
----
 {
 "itemdetails":{
   "furniture": [
@@ -42,15 +33,3 @@ submit in below format
     }
   
 }
----- required for chart
-_data= [{label: "furniture"
-y: 55.55555555555556}
-]
-_arrayOfDataChart
-{appliances: "1212", remaining: "16788"}
-
-_drillDownArrayJson
-{appliances: Array(1)}appliances: [{…}]__proto__: Object
-
-//line 210,  if(isCategoryAlreadyExisting(category)){
-updateArrayForDrillDown line 136
