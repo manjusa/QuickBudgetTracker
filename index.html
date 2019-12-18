@@ -95,7 +95,7 @@
                             totalCostOfAllCat+=cost;
                         }
                     }
-                    remaining=_total-totalCostOfAllCat;
+                    remaining=_total-totalCostOfAllCat;                  
                     return remaining;
 
                 }
@@ -143,7 +143,7 @@
                     var category=$("#category").val();
                     var boughtfrom=$("#boughtfrom").val();
                     var currItem=$("#itemname").val();
-                    if(currCost.length>0 &&category.length>0 &&currItem.length>0 &&boughtfrom.length>0){
+                    if(currCost.length>0 &&category.length>0 &&currItem.length>0 &&boughtfrom.length>0 &&getRemaining()>0){
                         $("#errormessage").hide();
                     }
                     else{
@@ -286,7 +286,8 @@
                     </div>
                     <div class="modal-body">
                         <div id="errormessage" style="display:none" class="alert alert-warning alert-dismissible fade show">
-                            <strong>Warning!</strong> Please enter a valid value in all the required fields before proceeding.
+                            <strong>Warning!</strong> Please enter a valid value in all the required fields before proceeding OR you dont have sufficient budget.
+                            To update budget press the info button
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
                         </div>
                         <form crole="form">
