@@ -15,6 +15,8 @@ y: 55.55555555555556}
 4) We have two variables which we use for displaychart and drilldown. These variables 
 are "_arrayOfDataChart" and "_drillDownArrayJson" respectively. Below is a sample of them
 
+5)Used jsonbin instead of database
+6)can create your own sqllite db etc to store json
 
 
 
